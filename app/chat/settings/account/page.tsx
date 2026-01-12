@@ -144,10 +144,10 @@ const AccountPage = () => {
           <Button type='link' onClick={() => {
             setIsModalOpen(true);
           }}>{t('changePassword')}</Button>
-          <Button className='ml-2' onClick={() => {
-            signOut({
+          <Button className='ml-2' onClick={async () => {
+            await signOut({
               redirect: true,
-              redirectTo: '/chat'
+              callbackUrl: '/login'
             });
           }}>{t('logout')}</Button>
         </div>

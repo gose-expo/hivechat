@@ -111,10 +111,10 @@ export default function RootLayout({
             <Popconfirm
               title={t('logoutNoticeTitle')}
               description={t('logoutNoticeDesc')}
-              onConfirm={() => {
-                signOut({
+              onConfirm={async () => {
+                await signOut({
                   redirect: true,
-                  redirectTo: '/chat'
+                  callbackUrl: '/login'
                 });
               }}
               okText={c('confirm')}
