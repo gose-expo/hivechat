@@ -7,7 +7,7 @@ import type { NextAuthConfig } from "next-auth";
 export const authConfig: NextAuthConfig = {
   providers: [], // Providers are configured in auth.ts, not here
   pages: {
-    signIn: '/auth/login',
+    signIn: '/login',
     error: '/auth/error',
   },
   callbacks: {
@@ -16,6 +16,8 @@ export const authConfig: NextAuthConfig = {
       const isOnChat = nextUrl.pathname.startsWith('/chat');
       const isOnAdmin = nextUrl.pathname.startsWith('/admin');
       const isOnAuth = nextUrl.pathname.startsWith('/auth');
+      const isOnLogin = nextUrl.pathname.startsWith('/login');
+      const isOnRegister = nextUrl.pathname.startsWith('/register');
       const isOnSetup = nextUrl.pathname.startsWith('/setup');
       const isOnApi = nextUrl.pathname.startsWith('/api');
 
@@ -24,8 +26,8 @@ export const authConfig: NextAuthConfig = {
         return true;
       }
 
-      // Allow setup and auth pages
-      if (isOnSetup || isOnAuth) {
+      // Allow setup, auth, login, and register pages
+      if (isOnSetup || isOnAuth || isOnLogin || isOnRegister) {
         return true;
       }
 
