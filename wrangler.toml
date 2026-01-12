@@ -9,6 +9,6 @@ assets = { directory = ".open-next/assets", binding = "ASSETS" }
 [vars]
 AUTH_SECRET = "kX9mZ2vN8qL4wR7yT1pA3sD6fG0hJ5iK"
 AUTH_TRUST_HOST = "true"
-NEXTAUTH_URL = "https://hivechat.alsn-ba2.workers.dev"
+NEXTAUTH_URL = "https://lisoexpo.de5.net"
 ADMIN_CODE = "hivechat2024"
 DATABASE_URL = "postgresql://neondb_owner:npg_LwDXAFnW6j2J@ep-tiny-fire-a12tzgkb-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
