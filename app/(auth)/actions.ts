@@ -3,9 +3,21 @@ import bcrypt from "bcryptjs";
 import { eq } from 'drizzle-orm';
 import { users, groups } from '@/app/db/schema';
 import { db } from '@/app/db';
-import { signIn } from '@/auth';
+import { signIn, signOut } from '@/auth';
 import { fetchAppSettings, setAppSettings } from "@/app/admin/system/actions";
 import { auth } from '@/auth';
+import { cookies } from 'next/headers';
+
+export async function logout() {
+  const cookieStore = await cookies();
+  // 清除所有 auth 相关的 cookies
+  cookieStore.delete('authjs.session-token');
+  cookieStore.delete('__Secure-authjs.session-token');
+  cookieStore.delete('authjs.callback-url');
+  cookieStore.delete('authjs.csrf-token');
+  await signOut({ redirect: false });
+  return { success: true };
+}
 
 export async function register(email: string, password: string) {
   const resultValue = await fetchAppSettings('isRegistrationOpen');
