@@ -63,6 +63,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               name: user.name,
               email: user.email,
               isAdmin: user.isAdmin || false,
+              isApproved: user.isApproved || false,
             };
           } else {
             return null;
@@ -84,6 +85,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.isAdmin = user.isAdmin;
+        token.isApproved = user.isApproved;
+      }
+      // 每次验证时重新检查用户审核状态
+      if (token.id) {
+        const dbUser = await db.query.users.findFirst({
+          where: eq(users.id, String(token.id))
+        });
+        if (dbUser) {
+          token.isApproved = dbUser.isApproved || dbUser.isAdmin || false;
+        }
       }
       if (account?.provider === "credentials" && token.sub) {
         token.provider = 'credentials';
@@ -125,10 +136,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       if (token) {
+        // 如果用户未审核，返回空 session 使其无法访问
+        if (!token.isApproved && !token.isAdmin) {
+          return { ...session, user: undefined } as any;
+        }
         session.user = {
-          ...session.user, // 保留已有的属性
+          ...session.user,
           id: String(token.id),
-          isAdmin: Boolean(token.isAdmin), // 添加 isAdmin
+          isAdmin: Boolean(token.isAdmin),
+          isApproved: Boolean(token.isApproved),
           provider: token.provider as string,
         };
       }
