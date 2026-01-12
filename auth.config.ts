@@ -1,44 +1,13 @@
 import type { NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import Feishu from "@/app/auth/providers/feishu";
-import Wecom from "@/app/auth/providers/wecom";
-import Dingding from "@/app/auth/providers/dingding";
 
-let authProviders: any[] = [];
-if (process.env.FEISHU_AUTH_STATUS === 'ON') {
-  const feishuAuth = Feishu({
-    clientId: process.env.FEISHU_CLIENT_ID!,
-    clientSecret: process.env.FEISHU_CLIENT_SECRET!,
-  });
-  authProviders.push(feishuAuth);
-}
-if (process.env.WECOM_AUTH_STATUS === 'ON') {
-  const wecomAuth = Wecom({
-    clientId: process.env.WECOM_CLIENT_ID!,
-    clientSecret: process.env.WECOM_CLIENT_SECRET!,
-  });
-  authProviders.push(wecomAuth);
-}
-if (process.env.DINGDING_AUTH_STATUS === 'ON') {
-  const dingdingAuth = Dingding({
-    clientId: process.env.DINGDING_CLIENT_ID!,
-    clientSecret: process.env.DINGDING_CLIENT_SECRET!,
-  });
-  authProviders.push(dingdingAuth);
-}
+// Edge-compatible auth config for middleware
+// This config does NOT include any providers that use Node.js APIs (database, bcrypt, etc.)
+// The full auth config with all providers is in auth.ts
 
 export const authConfig: NextAuthConfig = {
-  providers: [
-    ...authProviders,
-    // Credentials provider without authorize function for Edge compatibility
-    Credentials({
-      credentials: {
-        email: {},
-        password: {},
-      },
-    }),
-  ],
+  providers: [], // Providers are configured in auth.ts, not here
   pages: {
+    signIn: '/auth/login',
     error: '/auth/error',
   },
   callbacks: {
