@@ -21,6 +21,7 @@ export default function RegisterPage() {
   const [form] = Form.useForm<RegisterFormValues>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [fetchStatus, setFetchStatus] = useState(true);
 
@@ -54,6 +55,9 @@ export default function RegisterPage() {
       const result = await register(values.email, values.password);
       if (result.status === 'success') {
         window.location.href = "/chat";
+      } else if (result.status === 'pending') {
+        setError('');
+        setSuccess(result.message || '注册成功，请等待管理员审核');
       } else {
         setError(result.message || t('registerFail'));
       }
@@ -83,6 +87,14 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm space-y-6 rounded-lg bg-white p-6 shadow-xl">
         <h2 className="text-center text-2xl">{t('register')}</h2>
         {error && <Alert message={error} type="error" />}
+        {success && <Alert message={success} type="success" />}
+        {success ? (
+          <div className="text-center">
+            <Link href="/login">
+              <Button type="primary">{t('clickToLogin')}</Button>
+            </Link>
+          </div>
+        ) : (
         <Form
           form={form}
           layout="vertical"
@@ -132,6 +144,7 @@ export default function RegisterPage() {
             </Link>
           </div>
         </Form>
+        )}
       </div>
     </div>
   );

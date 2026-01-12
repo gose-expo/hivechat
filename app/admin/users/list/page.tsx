@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react'
-import { getUserList, addUser, updateUser, deleteUser } from './actions';
+import { getUserList, addUser, updateUser, deleteUser, approveUser, rejectUser } from './actions';
 import { Tag, Button, Modal, Form, Input, Switch, Divider, message, Skeleton, Select } from 'antd';
 import { UserType } from '@/app/db/schema';
 import { useTranslations } from 'next-intl';
@@ -150,6 +150,30 @@ const UserListTab = () => {
       }
     }
   }
+
+  const handleApproveUser = async (userId: string) => {
+    const result = await approveUser(userId);
+    if (result.success) {
+      const userList = await getUserList(groupSelectValue);
+      setUserList(userList);
+      message.success(result.message);
+    } else {
+      message.error(result.message);
+    }
+  }
+
+  const handleRejectUser = async (userId: string) => {
+    if (confirm('确定要拒绝并删除该用户吗？')) {
+      const result = await rejectUser(userId);
+      if (result.success) {
+        const userList = await getUserList(groupSelectValue);
+        setUserList(userList);
+        message.success(result.message);
+      } else {
+        message.error(result.message);
+      }
+    }
+  }
   return (
     <div className='container mb-6 px-4 md:px-0 pt-6'>
       <div className='w-full mb-6 flex flex-row justify-between items-center'>
@@ -175,12 +199,13 @@ const UserListTab = () => {
                 <th className='border-b border-r border-slate-300 p-2 min-w-16'>昵称</th>
                 <th className='border-b border-r border-slate-300 p-2'>Email</th>
                 <th className='border-b border-r border-slate-300 p-2'>{t('role')}</th>
+                <th className='border-b border-r border-slate-300 p-2'>状态</th>
                 <th className='border-b border-r border-slate-300 p-2'>所属分组</th>
                 <th className='border-b border-r border-slate-300 p-2'>每月限额</th>
                 <th className='border-b border-r border-slate-300 p-2'>今日用量</th>
                 <th className='border-b border-r border-slate-300 p-2'>本月用量</th>
                 <th className='border-b border-r border-slate-300 p-2'>{t('registerAt')}</th>
-                <th className='border-b border-slate-300 p-2 w-32'>{t('action')}</th>
+                <th className='border-b border-slate-300 p-2 w-48'>{t('action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -190,6 +215,13 @@ const UserListTab = () => {
                   <td className='border-t border-r text-sm border-slate-300 p-2'>{user.name ? user.name : '-'}</td>
                   <td className='border-t border-r text-sm border-slate-300 p-2'>{user.email ? user.email : '-'}</td>
                   <td className='border-t border-r text-sm text-center border-slate-300 p-2'>{user.isAdmin ? <Tag color="blue">{t('roleAdmin')}</Tag> : <Tag>{t('roleUser')}</Tag>}</td>
+                  <td className='border-t border-r text-sm text-center border-slate-300 p-2'>
+                    {user.isApproved ? (
+                      <Tag color="green">已审核</Tag>
+                    ) : (
+                      <Tag color="orange">待审核</Tag>
+                    )}
+                  </td>
                   <td className='border-t border-r text-sm text-center w-48 border-slate-300 p-2'>{user.groupId ? groupList.filter((group) => group.id === user.groupId)[0]?.name : '-'}</td>
                   <td className='border-t border-r text-sm text-right border-slate-300 p-2'>{
                     user.group?.tokenLimitType === 'unlimited' ? <Tag>不限</Tag> :
@@ -198,7 +230,27 @@ const UserListTab = () => {
                   <td className='border-t border-r text-xs text-right border-slate-300 p-2'>{user.todayTotalTokens.toLocaleString()} Tokens</td>
                   <td className='border-t border-r text-xs text-right border-slate-300 p-2'>{user.currentMonthTotalTokens.toLocaleString()} Tokens</td>
                   <td className='border-t border-r text-xs text-center w-36 border-slate-300 p-2'>{user.createdAt?.toISOString().slice(0, 19).replace('T', ' ')}</td>
-                  <td className='border-t text-center text-sm w-32 border-slate-300 p-2'>
+                  <td className='border-t text-center text-sm w-48 border-slate-300 p-2'>
+                    {!user.isApproved && (
+                      <>
+                        <Button
+                          size='small'
+                          className='text-sm'
+                          type='link'
+                          style={{ color: '#52c41a' }}
+                          onClick={() => handleApproveUser(user.id)}
+                        >通过</Button>
+                        <Divider type="vertical" />
+                        <Button
+                          size='small'
+                          className='text-sm'
+                          type='link'
+                          danger
+                          onClick={() => handleRejectUser(user.id)}
+                        >拒绝</Button>
+                        <Divider type="vertical" />
+                      </>
+                    )}
                     <Button
                       size='small'
                       className='text-sm'

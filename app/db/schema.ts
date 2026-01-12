@@ -34,6 +34,7 @@ export const users = pgTable("user", {
   feishuUnionId: text("feishuUnionId"),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   isAdmin: boolean("isAdmin").default(false),
+  isApproved: boolean("isApproved").default(false),
   image: text("image"),
   groupId: text("groupId"),
   todayTotalTokens: integer('today_total_tokens').notNull().default(0),

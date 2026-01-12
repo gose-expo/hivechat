@@ -52,6 +52,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!user || !user.password) {
             return null;
           }
+          // 检查用户是否已被审核通过（管理员自动通过）
+          if (!user.isApproved && !user.isAdmin) {
+            throw new Error('账号正在审核中，请等待管理员审核');
+          }
           const passwordMatch = await verifyPassword(password, user.password);
           if (passwordMatch) {
             return {

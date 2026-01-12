@@ -102,6 +102,7 @@ export async function addUser(user: UserActionParams & { password: string }) {
       email: user.email,
       password: hashedPassword,
       isAdmin: user.isAdmin,
+      isApproved: true,
       groupId: user.groupId
     })
     return {
@@ -157,5 +158,33 @@ export async function updateUser(email: string, user: UserActionParams) {
     }
   } catch (error) {
     return handleDatabaseError(error, 'User update failed');
+  }
+}
+
+export async function approveUser(userId: string) {
+  const session = await auth();
+  if (!session?.user.isAdmin) return handleDatabaseError(null, 'Not Allowed');
+  try {
+    await db.update(users).set({ isApproved: true }).where(eq(users.id, userId));
+    return {
+      success: true,
+      message: '用户审核通过'
+    }
+  } catch (error) {
+    return handleDatabaseError(error, '审核失败');
+  }
+}
+
+export async function rejectUser(userId: string) {
+  const session = await auth();
+  if (!session?.user.isAdmin) return handleDatabaseError(null, 'Not Allowed');
+  try {
+    await db.delete(users).where(eq(users.id, userId));
+    return {
+      success: true,
+      message: '已拒绝并删除用户'
+    }
+  } catch (error) {
+    return handleDatabaseError(error, '操作失败');
   }
 }

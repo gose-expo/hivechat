@@ -36,21 +36,17 @@ export async function register(email: string, password: string) {
       where: eq(groups.isDefault, true)
     });
     const groupId = defaultGroup?.id || null;
-    // 将新用户数据插入数据库
+    // 将新用户数据插入数据库，isApproved 默认为 false
     const result = await db.insert(users).values({
       email,
       password: hashedPassword,
-      groupId: groupId
+      groupId: groupId,
+      isApproved: false,
     });
-    // 注册成功后，自动登录
-    const signInResponse = await signIn("credentials", {
-      redirect: false, // 不跳转页面
-      email,
-      password,
-    });
-    // 返回成功消息或其他所需数据
+    // 返回等待审核状态，不自动登录
     return {
-      status: 'success',
+      status: 'pending',
+      message: '注册成功，请等待管理员审核',
     }
   } catch (error) {
     console.log(error)
@@ -92,6 +88,7 @@ export async function adminSetup(email: string, password: string, adminCode: str
       email,
       password: hashedPassword,
       isAdmin: true,
+      isApproved: true,
       groupId: groupId
     });
     // 注册成功后，自动登录
