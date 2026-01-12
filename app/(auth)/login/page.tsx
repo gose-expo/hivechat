@@ -11,7 +11,7 @@ import FeishuLogin from "@/app/components/FeishuLoginButton"
 import WecomLogin from "@/app/components/WecomLoginButton"
 import DingdingLogin from "@/app/components/DingdingLoginButton"
 import { fetchAppSettings } from '@/app/admin/system/actions';
-import { getActiveAuthProvides } from '@/app/(auth)/actions';
+import { getActiveAuthProvides, checkUserLoginStatus } from '@/app/(auth)/actions';
 import SpinLoading from '@/app/components/loading/SpinLoading';
 import { useTranslations } from 'next-intl';
 
@@ -32,6 +32,20 @@ export default function LoginPage() {
 
   async function handleSubmit(values: LoginFormValues) {
     setLoading(true);
+    setError("");
+
+    // 先检查用户状态
+    const statusCheck = await checkUserLoginStatus(values.email);
+    if (!statusCheck.canLogin) {
+      setLoading(false);
+      if (statusCheck.reason === 'pending_approval') {
+        setError('账号正在审核中，请等待管理员审核');
+      } else {
+        setError(t('passwordError'));
+      }
+      return;
+    }
+
     const response = await signIn("credentials", {
       email: values.email,
       password: values.password,

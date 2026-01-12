@@ -37,6 +37,22 @@ export async function logout() {
   return { success: true };
 }
 
+export async function checkUserLoginStatus(email: string) {
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, email)
+  });
+
+  if (!user) {
+    return { canLogin: false, reason: 'not_found' };
+  }
+
+  if (!user.isApproved && !user.isAdmin) {
+    return { canLogin: false, reason: 'pending_approval' };
+  }
+
+  return { canLogin: true, reason: null };
+}
+
 export async function register(email: string, password: string) {
   const resultValue = await fetchAppSettings('isRegistrationOpen');
   if (resultValue !== 'true') {
