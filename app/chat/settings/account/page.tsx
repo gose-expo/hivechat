@@ -146,8 +146,10 @@ const AccountPage = () => {
             setIsModalOpen(true);
           }}>{t('changePassword')}</Button>
           <Button className='ml-2' onClick={async () => {
+            // 先清除服务端 cookies
             await logout();
-            window.location.href = '/login';
+            // 然后跳转到 NextAuth 登出端点
+            window.location.href = '/api/auth/signout?callbackUrl=/login';
           }}>{t('logout')}</Button>
         </div>
       </div>

@@ -10,12 +10,30 @@ import { cookies } from 'next/headers';
 
 export async function logout() {
   const cookieStore = await cookies();
-  // 清除所有 auth 相关的 cookies
-  cookieStore.delete('authjs.session-token');
-  cookieStore.delete('__Secure-authjs.session-token');
-  cookieStore.delete('authjs.callback-url');
-  cookieStore.delete('authjs.csrf-token');
-  await signOut({ redirect: false });
+
+  // 获取所有可能的 cookie 名称并删除
+  const cookieNames = [
+    'authjs.session-token',
+    '__Secure-authjs.session-token',
+    'authjs.callback-url',
+    'authjs.csrf-token',
+    '__Host-authjs.csrf-token',
+    '__Secure-authjs.csrf-token',
+    'next-auth.session-token',
+    '__Secure-next-auth.session-token',
+    'next-auth.callback-url',
+    'next-auth.csrf-token',
+  ];
+
+  for (const name of cookieNames) {
+    cookieStore.set(name, '', {
+      expires: new Date(0),
+      path: '/',
+      secure: true,
+      httpOnly: true,
+    });
+  }
+
   return { success: true };
 }
 
