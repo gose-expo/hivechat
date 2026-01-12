@@ -33,6 +33,8 @@ if (process.env.DINGDING_AUTH_STATUS === 'ON') {
   authProviders.push(dingdingAuth);
 }
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET,
+  trustHost: true,
   providers: [
     ...authProviders,
     Credentials({
