@@ -3,7 +3,7 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // output: 'standalone', // Disabled for Cloudflare Pages
   experimental: {
     serverActions: {
       bodySizeLimit: '5mb',
