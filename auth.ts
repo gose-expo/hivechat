@@ -136,10 +136,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       if (token) {
-        // 如果用户未审核，返回空 session 使其无法访问
-        if (!token.isApproved && !token.isAdmin) {
-          return { ...session, user: undefined } as any;
-        }
         session.user = {
           ...session.user,
           id: String(token.id),
