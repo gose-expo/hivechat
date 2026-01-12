@@ -114,7 +114,7 @@ export default function RootLayout({
               description={t('logoutNoticeDesc')}
               onConfirm={async () => {
                 await logout();
-                window.location.href = '/api/auth/signout?callbackUrl=/login';
+                window.location.href = '/login';
               }}
               okText={c('confirm')}
               cancelText={c('cancel')}
