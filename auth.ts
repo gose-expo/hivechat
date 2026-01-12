@@ -36,8 +36,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     ...authProviders,
     Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
       credentials: {
         email: {},
         password: {},
@@ -65,18 +63,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
         } catch (error) {
           if (error instanceof ZodError) {
-            // 如果验证失败，返回 null 表示凭据无效
             return null;
           }
-          // 处理其他错误
           throw error;
         }
       },
     }),
-
   ],
   pages: {
-    error: '/auth/error', // 自定义错误页面
+    error: '/auth/error',
   },
   callbacks: {
     async jwt({ token, user, account }) {
