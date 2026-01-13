@@ -9,28 +9,33 @@ import { auth } from '@/auth';
 import { cookies } from 'next/headers';
 
 export async function logout() {
-  const cookieStore = await cookies();
+  await signOut({ redirect: false });
 
-  // 获取所有可能的 cookie 名称并删除
+  const cookieStore = cookies();
+  const isSecure =
+    process.env.NODE_ENV === "production" ||
+    process.env.AUTH_URL?.startsWith("https://") ||
+    process.env.NEXTAUTH_URL?.startsWith("https://");
+
   const cookieNames = [
-    'authjs.session-token',
-    '__Secure-authjs.session-token',
-    'authjs.callback-url',
-    'authjs.csrf-token',
-    '__Host-authjs.csrf-token',
-    '__Secure-authjs.csrf-token',
-    'next-auth.session-token',
-    '__Secure-next-auth.session-token',
-    'next-auth.callback-url',
-    'next-auth.csrf-token',
+    "authjs.session-token",
+    "__Secure-authjs.session-token",
+    "authjs.callback-url",
+    "authjs.csrf-token",
+    "__Host-authjs.csrf-token",
+    "__Secure-authjs.csrf-token",
+    "next-auth.session-token",
+    "__Secure-next-auth.session-token",
+    "next-auth.callback-url",
+    "next-auth.csrf-token",
   ];
 
   for (const name of cookieNames) {
-    cookieStore.set(name, '', {
+    cookieStore.set(name, "", {
       expires: new Date(0),
-      path: '/',
-      secure: true,
-      httpOnly: true,
+      maxAge: 0,
+      path: "/",
+      secure: isSecure,
     });
   }
 
