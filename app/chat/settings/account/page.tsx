@@ -1,10 +1,9 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { getUserUsage, updatePassword } from '../actions';
-import { logout } from '@/app/(auth)/actions';
 import { Button, Modal, Form, Input, Select, Progress, message } from 'antd';
 import { TranslationOutlined } from '@ant-design/icons';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import useUserSettingsStore from '@/app/store/userSettings';
 
@@ -146,8 +145,7 @@ const AccountPage = () => {
             setIsModalOpen(true);
           }}>{t('changePassword')}</Button>
           <Button className='ml-2' onClick={async () => {
-            await logout();
-            window.location.href = '/login';
+            await signOut({ redirectTo: '/login' });
           }}>{t('logout')}</Button>
         </div>
       </div>

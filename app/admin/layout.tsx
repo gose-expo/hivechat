@@ -14,8 +14,7 @@ import useAdminSidebarCollapsed from '@/app/store/adminSidebarCollapsed';
 import Spark from "@/app/images/spark.svg";
 import Sparkle from "@/app/images/sparkle.svg";
 import Mcp from "@/app/images/mcp.svg";
-import { useSession } from 'next-auth/react';
-import { logout } from '@/app/(auth)/actions';
+import { signOut, useSession } from 'next-auth/react';
 import SpinLoading from '@/app/components/loading/SpinLoading';
 import { useTranslations } from 'next-intl';
 
@@ -113,8 +112,7 @@ export default function RootLayout({
               title={t('logoutNoticeTitle')}
               description={t('logoutNoticeDesc')}
               onConfirm={async () => {
-                await logout();
-                window.location.href = '/login';
+                await signOut({ redirectTo: '/login' });
               }}
               okText={c('confirm')}
               cancelText={c('cancel')}
