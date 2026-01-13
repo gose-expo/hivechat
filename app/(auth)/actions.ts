@@ -30,12 +30,23 @@ export async function logout() {
     "next-auth.csrf-token",
   ];
 
-  for (const name of cookieNames) {
+  const existingCookieNames = cookieStore.getAll().map((cookie) => cookie.name);
+  const cookieNamesToClear = new Set(cookieNames);
+  for (const existingName of existingCookieNames) {
+    for (const baseName of cookieNames) {
+      if (existingName === baseName || existingName.startsWith(`${baseName}.`)) {
+        cookieNamesToClear.add(existingName);
+      }
+    }
+  }
+
+  for (const name of cookieNamesToClear) {
     cookieStore.set(name, "", {
       expires: new Date(0),
       maxAge: 0,
       path: "/",
       secure: isSecure,
+      httpOnly: true,
     });
   }
 
