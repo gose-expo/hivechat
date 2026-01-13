@@ -119,7 +119,7 @@ export default async function proxyGeminiStream(response: Response,
         const metadataString = `data: ${JSON.stringify({ metadata: metadataEvent })}\n\n`;
         controller.enqueue(new TextEncoder().encode(metadataString));
       }
-      updateUsage(messageInfo.userId, {
+      await updateUsage(messageInfo.userId, {
         chatId: messageInfo.chatId,
         date: new Date().toISOString().split('T')[0],
         userId: messageInfo.userId,

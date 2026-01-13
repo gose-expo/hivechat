@@ -100,20 +100,28 @@ export const isUserWithinQuota = async (userId: string, providerId: string, mode
 }
 
 export const updateUsage = async (userId: string, usage: UsageDetail) => {
-  updateUserUsage(userId, {
-    inputTokens: usage.inputTokens,
-    outputTokens: usage.outputTokens,
-    totalTokens: usage.totalTokens,
-  });
+  const tasks: Promise<unknown>[] = [];
 
-  if (usage.chatId) {
-    updateChatUsage(usage.chatId, {
+  tasks.push(
+    updateUserUsage(userId, {
       inputTokens: usage.inputTokens,
       outputTokens: usage.outputTokens,
       totalTokens: usage.totalTokens,
-    });
+    })
+  );
+
+  if (usage.chatId) {
+    tasks.push(
+      updateChatUsage(usage.chatId, {
+        inputTokens: usage.inputTokens,
+        outputTokens: usage.outputTokens,
+        totalTokens: usage.totalTokens,
+      })
+    );
   }
-  updateUsageReport(usage);
+
+  tasks.push(updateUsageReport(usage));
+  await Promise.all(tasks);
 }
 
 export const updateUserUsage = async (userId: string, usage: UsageType) => {
