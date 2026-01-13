@@ -13,7 +13,6 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isApproved = (auth?.user as any)?.isApproved || (auth?.user as any)?.isAdmin;
       const isOnChat = nextUrl.pathname.startsWith('/chat');
       const isOnAdmin = nextUrl.pathname.startsWith('/admin');
       const isOnAuth = nextUrl.pathname.startsWith('/auth');
@@ -32,9 +31,9 @@ export const authConfig: NextAuthConfig = {
         return true;
       }
 
-      // Protect chat and admin routes - user must be logged in AND approved
+      // Protect chat and admin routes
       if (isOnChat || isOnAdmin) {
-        if (isLoggedIn && isApproved) return true;
+        if (isLoggedIn) return true;
         return false; // Redirect to login
       }
 
